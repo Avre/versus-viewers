@@ -25,23 +25,28 @@ sheet_instance = sheet.get_worksheet(0)
 ##################################################################################
 #ARGUMENT INGESTION, VARIABLE INITIALIZATION AND JOIN
 ##################################################################################
+channel_names = []
 
 try:
-    channel_name = sys.argv[1]
+    for arg in sys.argv[2:]:
+        channel_names.append(arg)
 except IndexError:
-    channel_name = ['avaren']
+    channel_names = ['avaren']
 
 try:
-    set_prefix = sys.argv[2]
+    set_prefix = sys.argv[1]
 except IndexError:
     set_prefix = '?'
 
-active_channels = {}
-
-print(f'Joining twitch channel {channel_name} with {set_prefix} set as command prefix.')
+print(f'Joining twitch channels {", ".join(channel_names)} with {set_prefix} set as command prefix.')
 
 #Initialize default queue for each channel
-for channel in channel_name:
+for channel in channel_names:
+    os.makedirs(str(f'.{os.sep}{channel}'), exist_ok= True)
+
+active_channels = {}
+
+for channel in channel_names:
     active_channels[channel] = PlayerQueue(channel)
 
 
@@ -52,7 +57,7 @@ for channel in channel_name:
 class Bot(commands.Bot):
 
     def __init__(self):
-        super().__init__(token='AUTH_TOKEN_HERE', prefix=set_prefix, initial_channels=channel_name)
+        super().__init__(token='AUTH_TOKEN_HERE', prefix=set_prefix, initial_channels=channel_names)
 
     async def event_ready(self):
         print(f'Logged in as | {self.nick}')
@@ -153,14 +158,14 @@ class Bot(commands.Bot):
     @commands.command()
     async def position(self, ctx: commands.Context):
         handler = active_channels[ctx.channel.name]
-        await ctx.send(handler.speak(f'{ctx.author.name}, you are number {handler.current_queue.index(ctx.author.name) + 1} in queue.'))
-        print(f'{ctx.author.name}, you are number {handler.current_queue.index(ctx.author.name) + 1} in queue.')
+        await ctx.send(handler.speak(f'{ctx.author.name}, you are number {handler.current_queue.index(ctx.author.name) + 1} in the {handler.current_queue} queue.'))
+        print(f'{ctx.author.name}, you are number {handler.current_queue.index(ctx.author.name) + 1} in the {handler.current_queue} queue.')
 
     @commands.command()
     async def length(self, ctx: commands.Context):
         handler = active_channels[ctx.channel.name]
-        await ctx.send(handler.speak(f'The queue has {len(handler.current_queue)} players in it.'))
-        print(f'The queue has {len(handler.current_queue)} players in it.')
+        await ctx.send(handler.speak(f'The the {handler.current_queue} queue has {len(handler.current_queue)} players in it.'))
+        print(f'The the {handler.current_queue} queue has {len(handler.current_queue)} players in it.')
 
     @commands.command()
     async def next(self, ctx: commands.Context):
@@ -186,26 +191,52 @@ class Bot(commands.Bot):
         if not ctx.author.is_mod:
             await ctx.send(handler.speak(f'You are not a moderator, {ctx.author.name}'))
             print(f'You are not a moderator, {ctx.author.name}')
-            return        
+            return
         handler.clear_queue()
         await ctx.send(handler.speak(f'The {handler.queue_name} queue has been cleared.'))
         print(f'The {handler.queue_name} queue has been cleared.')
         sheet_instance.clear()
 
     @commands.command()
-    async def reset(self, ctx: commands.Context,):
+    async def reset(self, ctx: commands.Context):
         handler = active_channels[ctx.channel.name]
+        if not ctx.author.is_mod:
+            await ctx.send(handler.speak(f'You are not a moderator, {ctx.author.name}'))
+            print(f'You are not a moderator, {ctx.author.name}')
+            return
         handler.reset()
         await ctx.send(handler.speak(f'The queue {handler.queue_name} has been reset.'))
         print(f'The queue {handler.queue_name} has been reset.')
 
+    @commands.command()
+    async def select(self, ctx: commands.Context, *, full_message = 'default'):
+        handler = active_channels[ctx.channel.name]
+        if not ctx.author.is_mod:
+            await ctx.send(handler.speak(f'You are not a moderator, {ctx.author.name}'))
+            print(f'You are not a moderator, {ctx.author.name}')
+            return
+        handler.change_queue(full_message)
+        await ctx.send(handler.speak(f'The queue {handler.queue_name} has been selected.'))
+        print(f'The queue {handler.queue_name} has been selected.')
 
 
-    
+    @commands.command()
+    async def save(self, ctx: commands.Context):
+        handler = active_channels[ctx.channel.name]
+        if not ctx.author.is_mod:
+            await ctx.send(handler.speak(f'You are not a moderator, {ctx.author.name}'))
+            print(f'You are not a moderator, {ctx.author.name}')
+            return
+        handler.save()
+        await ctx.send(handler.speak(f'The queue {handler.queue_name} has been saved.'))
+        print(f'The queue {handler.queue_name} has been saved.')
+
+
+
 
 ###### TO DO
 #refactor google sheets to use self sheet instance per channel instance and make it less shit
-#clone pejters open, close, create, load, unload, save behavior
+#clone pejters open, close, create, load, unload, save
 
 
 
