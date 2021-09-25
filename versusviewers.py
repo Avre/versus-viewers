@@ -28,20 +28,13 @@ class PlayerQueue():
         else:
             return string
 
-    def create(self, queue_name = 'default'):
-        new_roster_file = str(f'{self.streamer_subdir}{self.streamer_name}_{queue_name.replace(" ", "-")}_roster.json'.lower())
-        new_queue_file = str(f'{self.streamer_subdir}{self.streamer_name}_{queue_name.replace(" ", "-")}_queue.json'.lower())
-        with open(new_roster_file,'w') as roster_file:
-            json.dump(dict(), roster_file, indent = 4)
-        with open(new_queue_file,'w') as queue_file:
-            json.dump(list(), queue_file, indent = 4)
-
     def load(self, queue_name = 'default'):
         self.roster_file = str(f'{self.streamer_subdir}{self.streamer_name}_{queue_name.replace(" ", "-")}_roster.json'.lower())
         self.queue_file = str(f'{self.streamer_subdir}{self.streamer_name}_{queue_name.replace(" ", "-")}_queue.json'.lower())
+        self.queue_name = queue_name.lower()
         self.load_roster()
         self.load_queue()
-        self.queue_name = queue_name
+        
 
     def save(self):
         self.save_queue()
@@ -81,9 +74,9 @@ class PlayerQueue():
         self.current_roster[player_name]['eligible'] = True
 
 
-    def open_queue(self, queue_name = 'default'):
+    def open_queue(self, queue_name):
         self.queue_open = True
-        self.queue_name = queue_name
+        self.queue_name = queue_name.lower()
         self.queue_file = str(f'{self.streamer_subdir}{self.streamer_name}_{queue_name.replace(" ", "-")}_queue.json'.lower())
         self.roster_file = str(f'{self.streamer_subdir}{self.streamer_name}_{queue_name.replace(" ", "-")}_roster.json'.lower())
         self.load_queue()
@@ -128,7 +121,7 @@ class PlayerQueue():
     def change_queue(self, queue_name):
         self.save_roster()
         self.save_queue()
-        self.queue_name = queue_name
+        self.queue_name = queue_name.lower()
         self.roster_file = str(f'{self.streamer_subdir}{self.streamer_name}_{queue_name.replace(" ", "-")}_roster.json'.lower())
         self.queue_file = str(f'{self.streamer_subdir}{self.streamer_name}_{queue_name.replace(" ", "-")}_queue.json'.lower())
         self.load_roster()

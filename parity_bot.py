@@ -51,6 +51,8 @@ active_channels = {}
 for channel in channel_names:
     active_channels[channel.lower()] = PlayerQueue(channel)
 
+with open('token.txt') as fp:
+    auth_token = fp.read()
 
 ##################################################################################
 #BOT INITIALIZATION
@@ -59,7 +61,7 @@ for channel in channel_names:
 class Bot(commands.Bot):
 
     def __init__(self):
-        super().__init__(token='token_here', prefix=set_prefix, initial_channels=channel_names)
+        super().__init__(token=auth_token, prefix=set_prefix, initial_channels=channel_names)
 
     async def event_ready(self):
         print(f'Logged in as | {self.nick}')
@@ -241,7 +243,7 @@ class Bot(commands.Bot):
 
 
     @commands.command()
-    async def dog(self, ctx: commands.Context):
+    async def troy(self, ctx: commands.Context):
         await ctx.send('OhMyDog')
         print('OhMyDog')
 
