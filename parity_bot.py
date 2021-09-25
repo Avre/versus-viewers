@@ -6,7 +6,7 @@ import os
 import gspread
 import pandas as pd
 from oauth2client.service_account import ServiceAccountCredentials
-from versusviewersv2 import PlayerQueue
+from versusviewers import PlayerQueue
 
 ##################################################################################
 #GOOGLE SHEETS CONNECTION
@@ -25,29 +25,31 @@ sheet_instance = sheet.get_worksheet(0)
 ##################################################################################
 #ARGUMENT INGESTION, VARIABLE INITIALIZATION AND JOIN
 ##################################################################################
-channel_names = []
-
-try:
-    for arg in sys.argv[2:]:
-        channel_names.append(arg)
-except IndexError:
-    channel_names = ['avaren']
 
 try:
     set_prefix = sys.argv[1]
 except IndexError:
     set_prefix = '?'
 
+channel_names = []
+
+if sys.argv[2:]:
+    for arg in sys.argv[2:]:
+        channel_names.append(arg)
+else:
+    channel_names = ['avaren']
+
+
 print(f'Joining twitch channels {", ".join(channel_names)} with {set_prefix} set as command prefix.')
 
 #Initialize default queue for each channel
 for channel in channel_names:
-    os.makedirs(str(f'.{os.sep}{channel}'), exist_ok= True)
+    os.makedirs(str(f'.{os.sep}queues{os.sep}{channel}'), exist_ok= True)
 
 active_channels = {}
 
 for channel in channel_names:
-    active_channels[channel] = PlayerQueue(channel)
+    active_channels[channel.lower()] = PlayerQueue(channel)
 
 
 ##################################################################################
@@ -57,7 +59,7 @@ for channel in channel_names:
 class Bot(commands.Bot):
 
     def __init__(self):
-        super().__init__(token='AUTH_TOKEN_HERE', prefix=set_prefix, initial_channels=channel_names)
+        super().__init__(token='21rrsrnu01fvuyaaumtvcy6n3q0108', prefix=set_prefix, initial_channels=channel_names)
 
     async def event_ready(self):
         print(f'Logged in as | {self.nick}')
@@ -91,7 +93,7 @@ class Bot(commands.Bot):
 
 
     @commands.command()
-    async def open(self, ctx: commands.Context, *, full_message='default'):
+    async def open(self, ctx: commands.Context):
         handler = active_channels[ctx.channel.name]
         # Mod check, check for an existing PlayerQueue object and create if necessary
         # Execute method to open queue and send notification to chat.
@@ -101,14 +103,14 @@ class Bot(commands.Bot):
             return
 
         if handler.queue_open:
-            await ctx.send(handler.speak(f'The {full_message} queue is already open.'))
-            print(f'The {full_message} queue is already open.')
+            await ctx.send(handler.speak(f'The {handler.queue_name} queue is already open.'))
+            print(f'The {handler.queue_name} queue is already open.')
             return
 
         handler.close_queue()
-        handler.open_queue(full_message)
-        await ctx.send(handler.speak(f'The {full_message} queue is now open!'))
-        print(f'The {full_message} queue is now open!')
+        handler.open_queue(handler.queue_name)
+        await ctx.send(handler.speak(f'The {handler.queue_name} queue is now open!'))
+        print(f'The {handler.queue_name} queue is now open!')
 
     @commands.command()
     async def close(self, ctx: commands.Context):
@@ -118,21 +120,21 @@ class Bot(commands.Bot):
             print(f'You are not a moderator, {ctx.author.name}.')
             return
         handler.close_queue()
-        await ctx.send(handler.speak(f'The {handler.current_queue} queue is now closed!'))
-        print(f'The {handler.current_queue} queue is now closed!')
+        await ctx.send(handler.speak(f'The {handler.queue_name} queue is now closed!'))
+        print(f'The {handler.queue_name} queue is now closed!')
 
 
     @commands.command()
     async def join(self, ctx: commands.Context):
         handler = active_channels[ctx.channel.name]
         if not handler.queue_open:
-            await ctx.send(handler.speak(f'The {handler.current_queue} queue is closed.'))
-            print(f'The {handler.current_queue} queue is closed.')
+            await ctx.send(handler.speak(f'The {handler.queue_name} queue is closed.'))
+            print(f'The {handler.queue_name} queue is closed.')
             return
 
         if ctx.author.name in handler.current_queue:
-            await ctx.send(handler.speak(f'You are already in the {handler.current_queue} queue, {ctx.author.name}'))
-            print(f'You are already in the {handler.current_queue} queue, {ctx.author.name}')
+            await ctx.send(handler.speak(f'You are already in the {handler.queue_name} queue, {ctx.author.name}'))
+            print(f'You are already in the {handler.queue_name} queue, {ctx.author.name}')
             return
 
         try:
@@ -144,28 +146,28 @@ class Bot(commands.Bot):
             print(f'{ctx.author.name} was not found in roster.')
 
         handler.join_queue(ctx.author.name)
-        await ctx.send(handler.speak(f'You are added to the {handler.current_queue} queue in position {handler.current_queue.index(ctx.author.name) + 1}, {ctx.author.name}'))
-        print(f'You are added to the {handler.current_queue} queue in position {handler.current_queue.index(ctx.author.name) + 1}, {ctx.author.name}')
+        await ctx.send(handler.speak(f'You are added to the {handler.queue_name} queue in position {handler.current_queue.index(ctx.author.name) + 1}, {ctx.author.name}'))
+        print(f'You are added to the {handler.queue_name} queue in position {handler.current_queue.index(ctx.author.name) + 1}, {ctx.author.name}')
 
 
     @commands.command()
     async def leave(self, ctx: commands.Context):
         handler = active_channels[ctx.channel.name]
         handler.leave_queue(ctx.author.name)
-        await ctx.send(handler.speak(f'You are removed from the {handler.current_queue} queue, {ctx.author.name}'))
-        print(f'You are removed from the {handler.current_queue} queue, {ctx.author.name}')
+        await ctx.send(handler.speak(f'You are removed from the {handler.queue_name} queue, {ctx.author.name}'))
+        print(f'You are removed from the {handler.queue_name} queue, {ctx.author.name}')
 
     @commands.command()
     async def position(self, ctx: commands.Context):
         handler = active_channels[ctx.channel.name]
-        await ctx.send(handler.speak(f'{ctx.author.name}, you are number {handler.current_queue.index(ctx.author.name) + 1} in the {handler.current_queue} queue.'))
-        print(f'{ctx.author.name}, you are number {handler.current_queue.index(ctx.author.name) + 1} in the {handler.current_queue} queue.')
+        await ctx.send(handler.speak(f'{ctx.author.name}, you are number {handler.current_queue.index(ctx.author.name) + 1} in the {handler.queue_name} queue.'))
+        print(f'{ctx.author.name}, you are number {handler.current_queue.index(ctx.author.name) + 1} in the {handler.queue_name} queue.')
 
     @commands.command()
     async def length(self, ctx: commands.Context):
         handler = active_channels[ctx.channel.name]
-        await ctx.send(handler.speak(f'The the {handler.current_queue} queue has {len(handler.current_queue)} players in it.'))
-        print(f'The the {handler.current_queue} queue has {len(handler.current_queue)} players in it.')
+        await ctx.send(handler.speak(f'The {handler.queue_name} queue has {len(handler.current_queue)} players in it.'))
+        print(f'The the {handler.queue_name} queue has {len(handler.current_queue)} players in it.')
 
     @commands.command()
     async def next(self, ctx: commands.Context):
@@ -175,6 +177,7 @@ class Bot(commands.Bot):
             print(f'You are not a moderator, {ctx.author.name}')
             return
         handler.next_player()
+        await ctx.send(handler.speak(f'It\'s your turn, {handler.current_player}.  Next in line is {handler.current_queue[0]}'))
         sheet_instance.clear()
         sheet_instance.append_rows([[handler.current_player]])
         sheet_instance.append_rows(doc_list(handler.current_queue))
@@ -231,6 +234,16 @@ class Bot(commands.Bot):
         await ctx.send(handler.speak(f'The queue {handler.queue_name} has been saved.'))
         print(f'The queue {handler.queue_name} has been saved.')
 
+    @commands.command()
+    async def queue(self, ctx: commands.Context):
+        handler = active_channels[ctx.channel.name]
+        await ctx.send(handler.speak(f'Current queue: {handler.queue_name} -- Status: {"open" if handler.queue_open else "closed"}.'))
+
+
+    @commands.command()
+    async def dog(self, ctx: commands.Context):
+        await ctx.send('OhMyDog')
+        print('OhMyDog')
 
 
 
