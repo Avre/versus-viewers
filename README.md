@@ -1,5 +1,6 @@
 # versus-viewers
-Twitch chat bot for managing viewer player queues
+Twitch chat bot for managing viewer player queues.
+
 Works in multiple channels at once with separate queue objects.
 
 
