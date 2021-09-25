@@ -59,7 +59,7 @@ for channel in channel_names:
 class Bot(commands.Bot):
 
     def __init__(self):
-        super().__init__(token='21rrsrnu01fvuyaaumtvcy6n3q0108', prefix=set_prefix, initial_channels=channel_names)
+        super().__init__(token='token_here', prefix=set_prefix, initial_channels=channel_names)
 
     async def event_ready(self):
         print(f'Logged in as | {self.nick}')
