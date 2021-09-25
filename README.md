@@ -23,3 +23,5 @@ research and create requirements.txt
 add config file functionality for easier customization of bot's messages
 
 Make this actually real documentation
+
+reposition code for more logical readability and COMMENT EVERYTHING
