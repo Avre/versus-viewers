@@ -1,0 +1,5 @@
+queues/
+token.txt
+credentials.json
+__pycache__/
+*.code-workspace
