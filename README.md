@@ -4,7 +4,7 @@ Works in multiple channels at once with separate queue objects.
 
 
 Parity bot is version to run alongside pejter's bot.
-Versus bot is unrestricted development.
+Versus bot (if present) is unrestricted development.
 versusviewers is the class definition for the queue manager object.
 
 heavily utilizes twitchio.  google sheet integration requires gspread.
