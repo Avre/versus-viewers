@@ -10,6 +10,17 @@ versusviewers is the class definition for the queue manager object.
 
 heavily utilizes twitchio.  google sheet integration requires gspread.
 
+## Quick Start
+
+* Download everything.
+* Install python if needed from https://www.python.org/downloads/
+* Go to www.twitchtokengenerator.com and connect to your bot account.  save client key in a file in the directory with the script called token.txt
+* run the bot in the command line using the following format: py scriptname.py [command prefix] [any number of channels separated by spaces]
+* example launch command: `py parity_bot.py ! avaren letsdaze_` will join the bot to twitch channel avaren and letsdaze_ with the command prefix !
+
+
+
+
 ## Functionality
 
 versus-viewers creates separate queue objects for each twitch channel it is joined to.  It saves both queue members and a roster file (anyone who has joined that queue) as human readable json files in directory ./queues/ with a file for each queue.
@@ -51,6 +62,7 @@ vv updates a google sheet with the current active queue members every !next comm
 
 Separate google sheet selection per instance.
 Prettify and add more info to sheet. (learn more pandas?)
+create documentation for creating google drive API service account and connecting to the sheet
 
 Handle more errors when methods fail due to index/name/etc errors (trying !next on an empty queue, etc)
 
