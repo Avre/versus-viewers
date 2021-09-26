@@ -239,19 +239,18 @@ class Bot(commands.Bot):
     @commands.command()
     async def queue(self, ctx: commands.Context):
         handler = active_channels[ctx.channel.name]
-        await ctx.send(handler.speak(f'Current queue: {handler.queue_name} -- Status: {"open" if handler.queue_open else "closed"}.'))
+        await ctx.send(handler.speak(f'Current queue: {handler.queue_name} -- Status: {"open" if handler.queue_open else "closed"}.  Use command !join to join an open queue.'))
 
+    @commands.command()
+    async def queuedoc(self, ctx: commands.Context):
+        handler = active_channels[ctx.channel.name]
+        await ctx.send(handler.speak(f'The current queue can be accessed at www.{handler.streamer_name}.versusviewers.com'))
+        print(f'The current queue can be accessed at www.{handler.streamer_name}.versusviewers.com')
 
     @commands.command()
     async def troy(self, ctx: commands.Context):
         await ctx.send('OhMyDog')
         print('OhMyDog')
-
-
-
-###### TO DO
-#refactor google sheets to use self sheet instance per channel instance and make it less shit
-#clone pejters open, close, create, load, unload, save
 
 
 
