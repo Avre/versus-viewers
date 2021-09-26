@@ -1,9 +1,6 @@
 #! python3.9
-from twitchio.ext import commands #type: ignore
-import json
-import sys
-import os
-import gspread
+from twitchio.ext import commands
+import json, sys, os, gspread
 import pandas as pd
 from oauth2client.service_account import ServiceAccountCredentials
 from versusviewers import PlayerQueue
