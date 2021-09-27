@@ -65,12 +65,11 @@ class Bot(commands.Bot):
         print(f'Logged in as | {self.nick}')
 
     async def event_message(self, message):
-
         if message.echo:
             return
-        if message.content.startswith(set_prefix):
+        if message.author.name == 'roborollbackian':
             print(f'{message.author.name}: {message.content}')
-        if message.author.name == 'RoboRollbackian':
+        if message.content.startswith(set_prefix):
             print(f'{message.author.name}: {message.content}')
         await self.handle_commands(message)
 
