@@ -26,7 +26,8 @@ sheet_instance = sheet.get_worksheet(0)
 try:
     set_prefix = sys.argv[1]
 except IndexError:
-    set_prefix = '?'
+    print('incorrect arguments')
+
 
 channel_names = []
 
@@ -34,7 +35,7 @@ if sys.argv[2:]:
     for arg in sys.argv[2:]:
         channel_names.append(arg)
 else:
-    channel_names = ['avaren']
+    print('incorrect arguments')
 
 
 print(f'Joining twitch channels {", ".join(channel_names)} with {set_prefix} set as command prefix.')
