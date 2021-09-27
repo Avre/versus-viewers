@@ -70,6 +70,8 @@ class Bot(commands.Bot):
             return
         if message.content.startswith(set_prefix):
             print(f'{message.author.name}: {message.content}')
+        if message.author.name == 'RoboRollbackian':
+            print(f'{message.author.name}: {message.content}')
         await self.handle_commands(message)
 
     @commands.command()
