@@ -52,6 +52,9 @@ for channel in channel_names:
 with open('token.txt') as fp:
     auth_token = fp.read()
 
+paritymessages = []
+newmessages= []
+
 ##################################################################################
 #BOT INITIALIZATION
 ##################################################################################
@@ -68,7 +71,7 @@ class Bot(commands.Bot):
         if message.echo:
             return
         if message.author.name == 'roborollbackian':
-            print(f'{message.author.name}: {message.content}')
+            paritymessages.append(message.content)
         if message.content.startswith(set_prefix):
             print(f'{message.author.name}: {message.content}')
         await self.handle_commands(message)
@@ -173,10 +176,31 @@ class Bot(commands.Bot):
     @commands.command()
     async def next(self, ctx: commands.Context):
         handler = active_channels[ctx.channel.name]
+        global paritymessages, newmessages
         if not ctx.author.is_mod:
             await ctx.send(handler.speak(f'You are not a moderator, {ctx.author.name}'))
             print(f'You are not a moderator, {ctx.author.name}')
             return
+
+        #parity check
+
+        for message in paritymessages:
+            if "been added" in message:
+                newmessages.append(message)
+                
+
+        for message in newmessages:
+            player = message.split(':')[0][1:]
+            playerposition = message.split(':')[1].split()[8]
+
+            if handler.current_queue[int(playerposition) - 1] == player:
+                print(f'{player} is in the correct position')
+            else:
+                print(f'correcting player {player} at position {playerposition}')
+                handler.current_queue[handler.current_queue.index(player)], handler.current_queue[int(playerposition)-1] = handler.current_queue[int(playerposition)-1], handler.current_queue[handler.current_queue.index(player)]
+
+        paritymessages, newmessages = [], []
+
         handler.next_player()
         await ctx.send(handler.speak(f'It\'s your turn, {handler.current_player}.  Next in line is {handler.current_queue[0]}'))
         sheet_instance.clear()
