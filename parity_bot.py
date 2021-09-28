@@ -204,14 +204,19 @@ class Bot(commands.Bot):
         handler.next_player()
         await ctx.send(handler.speak(f'It\'s your turn, {handler.current_player}.  Next in line is {handler.current_queue[0]}'))
         sheet_instance.clear()
-        sheet_instance.append_rows([[handler.current_player]])
         sheet_instance.append_rows(doc_list(handler.current_queue))
 
     @commands.command()
     async def list(self, ctx: commands.Context):
         handler = active_channels[ctx.channel.name]
+        if not ctx.author.is_mod:
+            await ctx.send(handler.speak(f'You are not a moderator, {ctx.author.name}'))
+            print(f'You are not a moderator, {ctx.author.name}')
+            return
         await ctx.send(handler.speak(f'{ctx.channel.name} is currently fighting {handler.current_player}!  Next 5 up are: {", ".join(handler.current_queue[:5])} '))
         print(f'{ctx.channel.name} is currently fighting {handler.current_player}!  Next 5 up are: {", ".join(handler.current_queue[:5])} ')
+        sheet_instance.clear()
+        sheet_instance.append_rows(doc_list(handler.current_queue))
 
     @commands.command()
     async def clear(self, ctx: commands.Context):
