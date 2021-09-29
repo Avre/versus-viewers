@@ -119,10 +119,29 @@ class Bot(commands.Bot):
     @commands.command()
     async def close(self, ctx: commands.Context):
         handler = active_channels[ctx.channel.name]
+        global paritymessages, newmessages
         if not ctx.author.is_mod:
             await ctx.send(handler.speak(f'You are not a moderator, {ctx.author.name}'))
             print(f'You are not a moderator, {ctx.author.name}.')
             return
+            #parity check
+
+        for message in paritymessages:
+            if "been added" in message:
+                newmessages.append(message)
+                
+
+        for message in newmessages:
+            player = message.split(':')[0][1:]
+            playerposition = message.split(':')[1].split()[8]
+
+            if handler.current_queue[int(playerposition) - 1] == player:
+                print(f'{player} is in the correct position')
+            else:
+                print(f'correcting player {player} at position {playerposition}')
+                handler.current_queue[handler.current_queue.index(player)], handler.current_queue[int(playerposition)-1] = handler.current_queue[int(playerposition)-1], handler.current_queue[handler.current_queue.index(player)]
+
+        paritymessages, newmessages = [], []
         handler.close_queue()
         await ctx.send(handler.speak(f'The {handler.queue_name} queue is now closed!'))
         print(f'The {handler.queue_name} queue is now closed!')
