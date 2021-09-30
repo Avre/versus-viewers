@@ -299,6 +299,35 @@ class Bot(commands.Bot):
         await ctx.send('OhMyDog')
         print('OhMyDog')
 
+    @commands.command()
+    async def wtbd(self, ctx: commands.Context, *, full_message = ''):
+        handler = active_channels[ctx.channel.name]
+        if ctx.author.name != 'avaren':
+            print(f'You are not an avaren, {ctx.author.name}')
+            return
+        if full_message == 'clear':
+            handler.clear_queue()
+            sheet_instance.clear()
+            print('queue cleared')
+            return
+        if full_message == 'reset':
+            handler.reset()
+            print('roster reset')
+        if full_message == 'push':
+            sheet_instance.clear()
+            sheet_instance.append_rows(doc_list(handler.current_queue))            
+        if full_message == 'status':
+            print(f'''
+            current queue is {handler.queue_name}
+            playing is {handler.current_player}
+            current queue is
+            ''')
+            for position, player in enumerate(handler.current_queue):
+                print(f'position {position} - player {player}')
+
+
+        
+
 
 
 
