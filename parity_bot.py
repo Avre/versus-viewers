@@ -315,7 +315,10 @@ class Bot(commands.Bot):
             print('roster reset')
         if full_message == 'push':
             sheet_instance.clear()
-            sheet_instance.append_rows(doc_list(handler.current_queue))            
+            sheet_instance.append_rows(doc_list(handler.current_queue))
+        if full_message.split()[0] == 'select':
+            handler.change_queue(' '.join(full_message.split()[1:]))
+            print(f'{" ".join(full_message.split()[1:])} queue selected')        
         if full_message == 'status':
             print(f'''
             current queue is {handler.queue_name}
