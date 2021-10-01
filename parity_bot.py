@@ -291,8 +291,8 @@ class Bot(commands.Bot):
     @commands.command()
     async def queuetracker(self, ctx: commands.Context):
         handler = active_channels[ctx.channel.name]
-        await ctx.send(f'The current queue can be accessed at www.{handler.streamer_name}.versusviewers.com')
-        print(f'The current queue can be accessed at www.{handler.streamer_name}.versusviewers.com')
+        await ctx.send(f'The current queue can be accessed at {handler.streamer_name}.versusviewers.com')
+        print(f'The current queue can be accessed at {handler.streamer_name}.versusviewers.com')
 
     @commands.command()
     async def troy(self, ctx: commands.Context):
