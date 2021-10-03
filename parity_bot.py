@@ -211,6 +211,8 @@ class Bot(commands.Bot):
         for message in newmessages:
             player = message.split(':')[0][1:]
             playerposition = message.split(':')[1].split()[8]
+            if player not in handler.current_queue:
+                continue
 
             if handler.current_queue[int(playerposition) - 1] == player:
                 print(f'{player} is in the correct position')
