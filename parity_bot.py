@@ -213,12 +213,14 @@ class Bot(commands.Bot):
             playerposition = message.split(':')[1].split()[8]
             if player not in handler.current_queue:
                 continue
-
-            if handler.current_queue[int(playerposition) - 1] == player:
-                print(f'{player} is in the correct position')
-            else:
-                print(f'correcting player {player} at position {playerposition}')
-                handler.current_queue[handler.current_queue.index(player)], handler.current_queue[int(playerposition)-1] = handler.current_queue[int(playerposition)-1], handler.current_queue[handler.current_queue.index(player)]
+            try:
+                if handler.current_queue[int(playerposition) - 1] == player:
+                    print(f'{player} is in the correct position')
+                else:
+                    print(f'correcting player {player} at position {playerposition}')
+                    handler.current_queue[handler.current_queue.index(player)], handler.current_queue[int(playerposition)-1] = handler.current_queue[int(playerposition)-1], handler.current_queue[handler.current_queue.index(player)]
+            except Exception as error:
+                print('error in correction process: ' + error)
 
         paritymessages, newmessages = [], []
 
