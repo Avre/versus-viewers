@@ -70,8 +70,8 @@ class Bot(commands.Bot):
     async def event_message(self, message):
         if message.echo:
             return
-        if message.author.name == 'roborollbackian':
-            paritymessages.append(message.content)
+        # if message.author.name == 'roborollbackian':
+        #     paritymessages.append(message.content)
         if message.content.startswith(set_prefix):
             print(f'{message.author.name}: {message.content}')
         await self.handle_commands(message)
@@ -126,22 +126,22 @@ class Bot(commands.Bot):
             return
             #parity check
 
-        for message in paritymessages:
-            if "been added" in message:
-                newmessages.append(message)
+        # for message in paritymessages:
+        #     if "been added" in message:
+        #         newmessages.append(message)
                 
 
-        for message in newmessages:
-            player = message.split(':')[0][1:]
-            playerposition = message.split(':')[1].split()[8]
+        # for message in newmessages:
+        #     player = message.split(':')[0][1:]
+        #     playerposition = message.split(':')[1].split()[8]
 
-            if handler.current_queue[int(playerposition) - 1] == player:
-                print(f'{player} is in the correct position')
-            else:
-                print(f'correcting player {player} at position {playerposition}')
-                handler.current_queue[handler.current_queue.index(player)], handler.current_queue[int(playerposition)-1] = handler.current_queue[int(playerposition)-1], handler.current_queue[handler.current_queue.index(player)]
+        #     if handler.current_queue[int(playerposition) - 1] == player:
+        #         print(f'{player} is in the correct position')
+        #     else:
+        #         print(f'correcting player {player} at position {playerposition}')
+        #         handler.current_queue[handler.current_queue.index(player)], handler.current_queue[int(playerposition)-1] = handler.current_queue[int(playerposition)-1], handler.current_queue[handler.current_queue.index(player)]
 
-        paritymessages, newmessages = [], []
+        # paritymessages, newmessages = [], []
         handler.close_queue()
         await ctx.send(handler.speak(f'The {handler.queue_name} queue is now closed!'))
         print(f'The {handler.queue_name} queue is now closed!')
@@ -203,26 +203,26 @@ class Bot(commands.Bot):
 
         #parity check
 
-        for message in paritymessages:
-            if "been added" in message:
-                newmessages.append(message)
+        # for message in paritymessages:
+        #     if "been added" in message:
+        #         newmessages.append(message)
                 
 
-        for message in newmessages:
-            player = message.split(':')[0][1:]
-            playerposition = message.split(':')[1].split()[8]
-            if player not in handler.current_queue:
-                continue
-            try:
-                if handler.current_queue[int(playerposition) - 1] == player:
-                    print(f'{player} is in the correct position')
-                else:
-                    print(f'correcting player {player} at position {playerposition}')
-                    handler.current_queue[handler.current_queue.index(player)], handler.current_queue[int(playerposition)-1] = handler.current_queue[int(playerposition)-1], handler.current_queue[handler.current_queue.index(player)]
-            except Exception as error:
-                print('error in correction process: ' + error)
+        # for message in newmessages:
+        #     player = message.split(':')[0][1:]
+        #     playerposition = message.split(':')[1].split()[8]
+        #     if player not in handler.current_queue:
+        #         continue
+        #     try:
+        #         if handler.current_queue[int(playerposition) - 1] == player:
+        #             print(f'{player} is in the correct position')
+        #         else:
+        #             print(f'correcting player {player} at position {playerposition}')
+        #             handler.current_queue[handler.current_queue.index(player)], handler.current_queue[int(playerposition)-1] = handler.current_queue[int(playerposition)-1], handler.current_queue[handler.current_queue.index(player)]
+        #     except Exception as error:
+        #         print('error in correction process: ' + error)
 
-        paritymessages, newmessages = [], []
+        # paritymessages, newmessages = [], []
 
         handler.next_player()
         await ctx.send(handler.speak(f'It\'s your turn, {handler.current_player}.  Next in line is {handler.current_queue[0]}'))
